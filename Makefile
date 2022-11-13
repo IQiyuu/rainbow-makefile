@@ -67,23 +67,26 @@ C2			= $(shell bc <<< "((($(CMP_COUNT)*100)/($(CMP_TOTAL) / 2))*255)/100")
 C4			= $(shell bc <<< "255 - (((($(CMP_COUNT) - ($(CMP_TOTAL) / 2))*100)/($(CMP_TOTAL) / 2))*255)/100")
 C5			= $(shell bc <<< "255 - $(C1)")
 CMP_TOTAL	= $(shell awk -F' ' '{printf NF}' <<< "$(S) $(S_BON)")
-CMP_COUNT	= 0
+CMP_COUNT	= $(shell ls | grep -c '\.o')
 
 all: $(OBJ) $(OBJ_BON)
 	@ar -rc $(NAME) $(OBJ) $(OBJ_BON)
+	@printf "\x1b\2K\r\x1b[38;2;255;0;255m$(NAME) has been successfully compiled!                                                    \n"
 
 bonus: $(NAME) $(OBJ_BON)
 	@ar -rc $(NAME) $(OBJ_BON)
+	@printf "\x1b\2K\r\x1b[38;2;255;0;0m$(NAME) has been successfully compiled!                                                    \n"
 
 $(NAME): $(OBJ)
 	@ar -rc $(NAME) $(OBJ)
+	@printf "\x1b\2K\r\x1b[38;2;255;0;0m$(NAME) has been successfully compiled!                                                    \n"
 
 .c.o:
 	@gcc $(CFLAGS) -o $@ -c $<
 	@$(eval CMP_COUNT = $(shell expr $(CMP_COUNT) + 1))
 	@if [ $(CMP_COUNT) -gt $(shell expr $(CMP_TOTAL) / 2) ]; \
-		then printf "\x1b[38;2;255;$(C5);$(C4)m$(CMP_COUNT) / $(CMP_TOTAL) » $<\n"; \
-		else printf "\x1b[38;2;$(C2);$(C1);255m$(CMP_COUNT) / $(CMP_TOTAL) » $<\n"; \
+		then printf "\x1b\2K\r\x1b[38;2;255;$(C5);$(C4)m$(CMP_COUNT) / $(CMP_TOTAL) » $<                                                     "; \
+		else printf "\x1b\2K\r\x1b[38;2;$(C2);$(C1);255m$(CMP_COUNT) / $(CMP_TOTAL) » $<                                                     "; \
 	fi
 
 clean:
